@@ -8,9 +8,13 @@ public class Renderer {
     public static void main(String[] args)
     {
 
-        Triangle t = new Triangle(new Point3D(100, 100, 100),
-                new Point3D(-100, -100, 100),
-                new Point3D(-100, 100, -100),
+        Point3D camera = new Point3D(0, 0, 0);
+        double d = 50;
+
+        Pyramid p = new Pyramid(new Point3D(100, 0, 200),
+                new Point3D(0, -100, 200),
+                new Point3D(0, 100, 200),
+                new Point3D(0, 100, 250),
                 Color.WHITE);
 
         JFrame frame = new JFrame();
@@ -24,20 +28,10 @@ public class Renderer {
                 g2.setColor(Color.BLACK);
                 g2.fillRect(0, 0, getWidth(), getHeight());
 
-                // Render Here
-
                 // Center at origin (middle of screen)
                 g2.translate(getWidth() / 2, getHeight() / 2);
 
-                g2.setColor(Color.WHITE);
-
-                Path2D path = new Path2D.Double();
-
-                path.moveTo(t.p1.x, t.p1.y);
-                path.lineTo(t.p2.x, t.p2.y);
-                path.lineTo(t.p3.x, t.p3.y);
-                path.closePath();
-                g2.draw(path);
+                p.draw(g2, camera, d);
             }
         };
 
