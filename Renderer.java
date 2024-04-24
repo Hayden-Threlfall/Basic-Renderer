@@ -17,7 +17,7 @@ public class Renderer {
         Point2D mouse = new Point2D(WIDTH / 2, HEIGHT / 2);
         ArrayList<Object3D> world_objects = new ArrayList<Object3D>();
 
-        // Axis Lines
+        // X, Y, Z Axis Lines
         if (SHOW_AXIS_LINES)
         {
             Line3D z_line = new Line3D(new Point3D[]{
@@ -51,6 +51,7 @@ public class Renderer {
         world_objects.add(c);
 
 
+        // Do the Computer Graphics
         JFrame frame = new JFrame();
         Container pane = frame.getContentPane();
 
@@ -82,6 +83,7 @@ public class Renderer {
 
                 Matrix3 transform = headingTransform.multiply(pitchTransform);
 
+                // Render Stored 3D Objects
                 for (Object3D object : world_objects)
                 {
                     object.draw(g2, transform);
