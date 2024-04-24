@@ -13,6 +13,7 @@ public class Renderer {
         final int WIDTH = 1000;
         final double DRAG_SPEED = 180;
         final boolean SHOW_AXIS_LINES = true;
+        final Color BACKGROUND_COLOR = Color.BLACK;
 
         Point2D mouse = new Point2D(WIDTH / 2, HEIGHT / 2);
         ArrayList<Object3D> world_objects = new ArrayList<Object3D>();
@@ -60,28 +61,28 @@ public class Renderer {
             public void paintComponent(Graphics g)
             {
                 Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Color.BLACK);
+                g2.setColor(BACKGROUND_COLOR);
                 g2.fillRect(0, 0, getWidth(), getHeight());
 
                 // Center at origin (middle of screen)
                 g2.translate(getWidth() / 2, getHeight() / 2);
 
                 // Calculate Transform
-                double heading = Math.toRadians(mouse.x);
-                Matrix3 headingTransform = new Matrix3(new double[]{
-                   Math.cos(heading), 0, -Math.sin(heading),
-                   0, 1, 0,
-                   Math.sin(heading), 0, Math.cos(heading)
-                });
-
-                double pitch = Math.toRadians(mouse.y);
+                double pitch = Math.toRadians(mouse.x);
                 Matrix3 pitchTransform = new Matrix3(new double[]{
-                   1, 0, 0,
-                   0, Math.cos(pitch), Math.sin(pitch),
-                   0, -Math.sin(pitch), Math.cos(pitch)
+                   Math.cos(pitch), 0, -Math.sin(pitch),
+                   0, 1, 0,
+                   Math.sin(pitch), 0, Math.cos(pitch)
                 });
 
-                Matrix3 transform = headingTransform.multiply(pitchTransform);
+                double roll = Math.toRadians(mouse.y);
+                Matrix3 rollTransform = new Matrix3(new double[]{
+                   1, 0, 0,
+                   0, Math.cos(roll), Math.sin(roll),
+                   0, -Math.sin(roll), Math.cos(roll)
+                });
+
+                Matrix3 transform = pitchTransform.multiply(rollTransform);
 
                 // Render Stored 3D Objects
                 for (Object3D object : world_objects)
