@@ -12,34 +12,28 @@ public class Pyramid extends Object3D {
         this.color = color;
     }
 
-    public void draw(Graphics2D g2, Point3D camera, double d)
+    public void draw(Graphics2D g2, Matrix3 transform)
     {
         short i = 0;
         Path2D path = new Path2D.Double();
         g2.setColor(this.color);
 
-        Point2D[] translate_points = new Point2D[4];
+        Point3D[] translate_points = new Point3D[4];
 
-        // Translae Points to camera
+        // Translate Points to camera
         for (Point3D point : this.points)
         {
-            double camera_plane = point.z - camera.z;
-            // double path_x = ((point.x - camera.x) * (camera_plane / point.z)) + camera.x;
-            // double path_y = ((point.x - camera.x) * (camera_plane / point.z)) + camera.x;
-            double path_x = point.x * (d / point.z);
-            double path_y = point.y * (d / point.z);
+            translate_points[i] = transform.transform(point);
 
-
-            translate_points[i] = new Point2D(path_x, path_y);
             i++;
         }
 
 
         // Draw all Lines
-        for (Point2D point : translate_points)
+        for (Point3D point : translate_points)
         {
             path.moveTo(point.x, point.y);
-            for (Point2D point2 : translate_points)
+            for (Point3D point2 : translate_points)
             {
                 if (point == point2)
                     continue;
@@ -49,8 +43,6 @@ public class Pyramid extends Object3D {
             }
         }
 
-
-        System.out.println("stop");
         path.closePath();
         g2.draw(path);
 
