@@ -2,19 +2,54 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-
+import java.util.ArrayList;
 
 
 public class Renderer {
 
     public static void main(String[] args)
     {
-        final int HEIGHT = 600;
-        final int WIDTH = 600;
+        final int HEIGHT = 1000;
+        final int WIDTH = 1000;
+        final double DRAG_SPEED = 180;
+        final boolean SHOW_AXIS_LINES = true;
 
         Point2D mouse = new Point2D(WIDTH / 2, HEIGHT / 2);
+        ArrayList<Object3D> world_objects = new ArrayList<Object3D>();
 
-        Cube c = new Cube(200, Color.WHITE);
+        // Axis Lines
+        if (SHOW_AXIS_LINES)
+        {
+            Line3D z_line = new Line3D(new Point3D[]{
+                    new Point3D(0, 0, HEIGHT * -2),
+                    new Point3D(0, 0, HEIGHT * 2)
+            },
+                    Color.BLUE);
+
+            world_objects.add(z_line);
+
+            Line3D x_line = new Line3D(new Point3D[]{
+                    new Point3D(WIDTH * -2, 0, 0),
+                    new Point3D(WIDTH * 2, 0, 0)
+            },
+                    Color.RED);
+
+            world_objects.add(x_line);
+
+            Line3D y_line = new Line3D(new Point3D[]{
+                    new Point3D(0, WIDTH * -2, 0),
+                    new Point3D(0, WIDTH * 2, 0)
+            },
+                    Color.GREEN);
+
+            world_objects.add(y_line);
+        }
+
+        // OTHER OBJECTS
+        Cube c = new Cube(250, Color.WHITE, new Point3D(0, 0, 0));
+
+        world_objects.add(c);
+
 
         JFrame frame = new JFrame();
         Container pane = frame.getContentPane();
@@ -47,7 +82,10 @@ public class Renderer {
 
                 Matrix3 transform = headingTransform.multiply(pitchTransform);
 
-                c.draw(g2, transform);
+                for (Object3D object : world_objects)
+                {
+                    object.draw(g2, transform);
+                }
             }
         };
 
@@ -55,8 +93,8 @@ public class Renderer {
         renderingPanel.addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                double yi = 180.0 / renderingPanel.getHeight();
-                double xi = 180.0 / renderingPanel.getWidth();
+                double yi = DRAG_SPEED / renderingPanel.getHeight();
+                double xi = DRAG_SPEED / renderingPanel.getWidth();
 
                 mouse.x = e.getX() * xi;
                 mouse.y = e.getY() * yi;

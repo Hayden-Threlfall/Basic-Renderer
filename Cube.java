@@ -8,17 +8,17 @@ public class Cube extends Object3D{
     int[][] lines;
     Color color;
 
-    Cube(int size, Color c)
+    Cube(int size, Color c, Point3D cube_origin)
     {
         this.points = new Point3D[]{
-                new Point3D(0, 0, 0),
-                new Point3D(0, 0, size),
-                new Point3D(0, size, 0),
-                new Point3D(0, size, size),
-                new Point3D(size, 0, 0),
-                new Point3D(size, 0, size),
-                new Point3D(size, size, 0),
-                new Point3D(size, size, size)
+                cube_origin,
+                new Point3D(cube_origin.x, cube_origin.y, cube_origin.z + size),
+                new Point3D(cube_origin.x, cube_origin.y + size, cube_origin.z),
+                new Point3D(cube_origin.x, cube_origin.y + size, cube_origin.z + size),
+                new Point3D(cube_origin.x + size, cube_origin.y, cube_origin.z),
+                new Point3D(cube_origin.x + size, cube_origin.y, cube_origin.z + size),
+                new Point3D(cube_origin.x + size, cube_origin.y + size, cube_origin.z),
+                new Point3D(cube_origin.x + size, cube_origin.y + size, cube_origin.z + size)
         };
 
         this.lines = new int[][] {
@@ -54,7 +54,7 @@ public class Cube extends Object3D{
         // Draw all Lines
         Path2D path = new Path2D.Double();
 
-        for (int[] line : lines)
+        for (int[] line : this.lines)
         {
             Point3D p1 = translate_points[line[0]];
             Point3D p2 = translate_points[line[1]];
