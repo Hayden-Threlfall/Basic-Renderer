@@ -7,39 +7,50 @@ import java.util.ArrayList;
 
 public class Renderer {
 
+    static final int HEIGHT = 1080;
+    static final int WIDTH = 1920;
+    static final int FOV = 90;
+    static final boolean SHOW_AXIS_LINES = true;
+    static final Color BACKGROUND_COLOR = Color.BLACK;
+    static final boolean ROTATE_MODE = true;
+
     public static void main(String[] args)
     {
-        final int HEIGHT = 1000;
-        final int WIDTH = 1000;
-        final double DRAG_SPEED = 180;
-        final boolean SHOW_AXIS_LINES = true;
-        final Color BACKGROUND_COLOR = Color.BLACK;
 
-        Point2D mouse = new Point2D(WIDTH / 2, HEIGHT / 2);
+
+        final double DRAG_SPEED = 50;
+        final double ASPECT_RATIO = (double) HEIGHT / WIDTH;
+        final double FOV_RAD = 1 / (Math.tan(Math.toRadians(FOV / 2.0)));
+        final double Z_NEAR = 0.1;
+        final double Z_FAR = 1000;
+        final double Q = Z_FAR/(Z_FAR - Z_NEAR);
+
+//        Point2D mouse = new Point2D(WIDTH / 2, HEIGHT / 2);
+        Point2D mouse = new Point2D(0, 0);
         ArrayList<Object3D> world_objects = new ArrayList<Object3D>();
 
         // X, Y, Z Axis Lines
         if (SHOW_AXIS_LINES)
         {
             Line3D z_line = new Line3D(new Point3D[]{
-                    new Point3D(0, 0, HEIGHT * -2),
-                    new Point3D(0, 0, HEIGHT * 2)
+                    new Point3D(0, 0, -3),
+                    new Point3D(0, 0, 3)
             },
                     Color.BLUE);
 
             world_objects.add(z_line);
 
             Line3D x_line = new Line3D(new Point3D[]{
-                    new Point3D(WIDTH * -2, 0, 0),
-                    new Point3D(WIDTH * 2, 0, 0)
+                    new Point3D(-3, 0, 0),
+                    new Point3D(3, 0, 0)
             },
                     Color.RED);
 
             world_objects.add(x_line);
 
             Line3D y_line = new Line3D(new Point3D[]{
-                    new Point3D(0, WIDTH * -2, 0),
-                    new Point3D(0, WIDTH * 2, 0)
+                    new Point3D(0, -3, 0),
+                    new Point3D(0, 3, 0)
             },
                     Color.GREEN);
 
@@ -47,7 +58,7 @@ public class Renderer {
         }
 
         // OTHER OBJECTS
-        Cube c = new Cube(250, Color.WHITE, new Point3D(0, 0, 0));
+        Cube c = new Cube(1, Color.WHITE, new Point3D(-0.5, -0.5, -0.5));
 
         world_objects.add(c);
 
@@ -65,29 +76,50 @@ public class Renderer {
                 g2.fillRect(0, 0, getWidth(), getHeight());
 
                 // Center at origin (middle of screen)
-                g2.translate(getWidth() / 2, getHeight() / 2);
+//                g2.translate(getWidth() / 2, getHeight() / 2);
 
-                // Calculate Transform
-                double pitch = Math.toRadians(mouse.x);
+                // Calculate POV transform
+                Matrix4 map_projection = new Matrix4(new double[][]{
+                        {ASPECT_RATIO * FOV_RAD, 0, 0, 0},
+                        {0, FOV_RAD, 0, 0},
+                        {0, 0, Q, 1},
+                        {0, 0, -Z_NEAR * Q, 0}
+                });
+
+                // Calculate rotation Transforms
+                double pitch = Math.toRadians(mouse.y);
+                Matrix4 z_r_transform = new Matrix4(new double[][]{
+                        {Math.cos(pitch), Math.sin(pitch), 0, 0},
+                        {-Math.sin(pitch), Math.cos(pitch), 0 , 0},
+                        {0, 0, 1, 0},
+                        {0, 0, 0, 1}
+                });
                 Matrix3 pitchTransform = new Matrix3(new double[]{
                    Math.cos(pitch), 0, -Math.sin(pitch),
                    0, 1, 0,
                    Math.sin(pitch), 0, Math.cos(pitch)
                 });
 
-                double roll = Math.toRadians(mouse.y);
+                double roll = Math.toRadians(mouse.x);
+                Matrix4 x_r_transform = new Matrix4(new double[][]{
+                        {1, 0, 0, 0},
+                        {0, Math.cos(roll * 0.5), Math.sin(roll * 0.5), 0},
+                        {0, -Math.sin(roll * 0.5), Math.cos(roll * 0.5), 0},
+                        {0, 0, 0, 1}
+                });
+
                 Matrix3 rollTransform = new Matrix3(new double[]{
                    1, 0, 0,
                    0, Math.cos(roll), Math.sin(roll),
                    0, -Math.sin(roll), Math.cos(roll)
                 });
 
-                Matrix3 transform = pitchTransform.multiply(rollTransform);
-
+                Matrix3 r_transform = pitchTransform.multiply(rollTransform);
                 // Render Stored 3D Objects
                 for (Object3D object : world_objects)
                 {
-                    object.draw(g2, transform);
+                    object.draw(g2, x_r_transform, z_r_transform, map_projection);
+//                    object.draw(g2, r_transform, map_projection);
                 }
             }
         };
@@ -96,13 +128,15 @@ public class Renderer {
         renderingPanel.addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                double yi = DRAG_SPEED / renderingPanel.getHeight();
-                double xi = DRAG_SPEED / renderingPanel.getWidth();
+                if (!ROTATE_MODE) {
+                    double yi = DRAG_SPEED / renderingPanel.getHeight();
+                    double xi = DRAG_SPEED / renderingPanel.getWidth();
 
-                mouse.x = e.getX() * xi;
-                mouse.y = e.getY() * yi;
+                    mouse.x = e.getX() * xi;
+                    mouse.y = e.getY() * yi;
 
-                renderingPanel.repaint();
+                    renderingPanel.repaint();
+                }
             }
 
             @Override
@@ -116,6 +150,23 @@ public class Renderer {
         frame.setSize(WIDTH, HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+
+        // Rotate mode needs 60~ fps
+        if (ROTATE_MODE) {
+            while (true) {
+                renderingPanel.repaint();
+
+                mouse.x += 1;
+                mouse.y += 0.25;
+
+                try {
+                    Thread.sleep(25);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            }
+        }
     }
 }
 

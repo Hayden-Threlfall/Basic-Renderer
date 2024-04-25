@@ -14,13 +14,34 @@ public abstract class Object3D
 
     Object3D() {}
 
-    public void draw(Graphics2D g2, Matrix3 transform)
+    public void draw(Graphics2D g2, Matrix4 x_r_transform, Matrix4 z_r_transform, Matrix4 map_projection)
     {
         g2.setColor(this.color);
 
         for (Triangle t : this.triangles)
         {
-            t.draw(g2, transform);
+            t.draw(g2, x_r_transform, z_r_transform, map_projection);
+        }
+    }
+
+    public void draw(Graphics2D g2, Matrix3 r_transform, Matrix4 map_projection)
+    {
+        g2.setColor(this.color);
+        for (Triangle t: this.triangles)
+        {
+            t.draw(g2, r_transform, map_projection);
+        }
+    }
+
+    public void print()
+    {
+        for (Triangle t : this.triangles)
+        {
+            for (Point3D p : t.points)
+            {
+                p.print();
+            }
+            System.out.println();
         }
     }
 }
