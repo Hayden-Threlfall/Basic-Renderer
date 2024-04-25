@@ -2,7 +2,7 @@ import java.awt.Color;
 
 public class Cube extends Object3D{
 
-    Cube(int size, Color c, Point3D cube_origin)
+    Cube(double size, Color c, Point3D cube_origin)
     {
         super(new Triangle[]{
                 // South Face

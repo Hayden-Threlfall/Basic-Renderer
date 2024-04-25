@@ -33,7 +33,7 @@ public class Triangle {
 
 
             // Translate / Project
-            rotated_point.z += 0;
+            rotated_point.z += 5;
 
             Point3D projected_point = map_projection.multiplyPoint(rotated_point);
 
