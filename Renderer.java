@@ -98,8 +98,8 @@ public class Renderer {
                 double roll = Math.toRadians(mouse.x);
                 Matrix4 x_r_transform = new Matrix4(new double[][]{
                         {1, 0, 0, 0},
-                        {0, Math.cos(roll * 0.5), Math.sin(roll * 0.5), 0},
-                        {0, -Math.sin(roll * 0.5), Math.cos(roll * 0.5), 0},
+                        {0, Math.cos(roll * 0.5), Math.sin(roll), 0},
+                        {0, -Math.sin(roll * 0.5), Math.cos(roll), 0},
                         {0, 0, 0, 1}
                 });
 
