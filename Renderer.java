@@ -94,11 +94,6 @@ public class Renderer {
                         {0, 0, 1, 0},
                         {0, 0, 0, 1}
                 });
-                Matrix3 pitchTransform = new Matrix3(new double[]{
-                   Math.cos(pitch), 0, -Math.sin(pitch),
-                   0, 1, 0,
-                   Math.sin(pitch), 0, Math.cos(pitch)
-                });
 
                 double roll = Math.toRadians(mouse.x);
                 Matrix4 x_r_transform = new Matrix4(new double[][]{
@@ -108,13 +103,6 @@ public class Renderer {
                         {0, 0, 0, 1}
                 });
 
-                Matrix3 rollTransform = new Matrix3(new double[]{
-                   1, 0, 0,
-                   0, Math.cos(roll), Math.sin(roll),
-                   0, -Math.sin(roll), Math.cos(roll)
-                });
-
-                Matrix3 r_transform = pitchTransform.multiply(rollTransform);
                 // Render Stored 3D Objects
                 for (Object3D object : world_objects)
                 {
