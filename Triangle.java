@@ -12,34 +12,30 @@ public class Triangle {
         this.color = color;
     }
 
-    public void draw(Graphics2D g2, Point3D camera, double d)
+    Triangle(Point3D[] p, Color c)
     {
-        short i = 0;
+        this.points = p;
+        this.color = c;
+    }
+
+    public void draw(Graphics2D g2, Matrix3 transform)
+    {
         Path2D path = new Path2D.Double();
         g2.setColor(this.color);
 
-        // Translae Points to camera
-        for (Point3D point : this.points)
+        // Translate & Draw Points
+        for (int i = 0; i < this.points.length; i++)
         {
-            double camera_plane = point.z - camera.z;
-            // double path_x = ((point.x - camera.x) * (camera_plane / point.z)) + camera.x;
-            // double path_y = ((point.x - camera.x) * (camera_plane / point.z)) + camera.x;
-            double path_x = point.x * (d / point.z);
-            double path_y = point.y * (d / point.z);
-
+            Point3D translated_point = transform.transform(this.points[i]);
 
             if (i == 0)
             {
-                path.moveTo(path_x, path_y);
+                path.moveTo(translated_point.x, translated_point.y);
+            } else {
+                path.lineTo(translated_point.x, translated_point.y);
             }
-            else
-            {
-                path.lineTo(path_x, path_y);
-            }
-            i++;
         }
 
-        System.out.println("stop");
         path.closePath();
         g2.draw(path);
 
