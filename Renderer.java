@@ -25,7 +25,6 @@ public class Renderer {
         final double Z_FAR = 1000;
         final double Q = Z_FAR/(Z_FAR - Z_NEAR);
 
-//        Point2D mouse = new Point2D(WIDTH / 2, HEIGHT / 2);
         Point mouse = new Point(0, 0);
         ArrayList<Object3D> world_objects = new ArrayList<Object3D>();
 
@@ -105,7 +104,6 @@ public class Renderer {
                 for (Object3D object : world_objects)
                 {
                     object.draw(g2, x_r_transform, z_r_transform, map_projection);
-//                    object.draw(g2, r_transform, map_projection);
                 }
             }
         };
