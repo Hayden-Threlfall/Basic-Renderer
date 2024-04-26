@@ -36,6 +36,7 @@ public abstract class Object3D
             for (int i = 0; i < t.points.length; i++)
             {
                 rotated_points[i] = z_r_transform.multiplyPoint(x_r_transform.multiplyPoint(t.points[i]));
+                rotated_points[i].z += 8;
             }
 
             // Calculate Normals and stuff
@@ -59,17 +60,15 @@ public abstract class Object3D
             normal.z /= n;
 
             // If normal.z < 0
-            if (!(normal.x * (rotated_points[0].x - Camera.x) +
+            if (!((normal.x * (rotated_points[0].x - Camera.x) +
                     normal.y * (rotated_points[0].y - Camera.y) +
-                    normal.z * (rotated_points[0].z - Camera.z) < 0))
+                    normal.z * (rotated_points[0].z - Camera.z)) < 0))
                 continue;
 
             // Project Points
             for (int i = 0; i < t.points.length; i++)
             {
                 // Translate / Project
-                rotated_points[i].z += 5;
-
                 Vertex projected_point = map_projection.multiplyPoint(rotated_points[i]);
 
                 // Scale Point
@@ -96,30 +95,35 @@ public abstract class Object3D
             g2.draw(path);
 
             // Rasterisation
-            Vertex v1 = projected_points[0];
-            Vertex v2 = projected_points[1];
-            Vertex v3 = projected_points[2];
+            if (Renderer.DRAW_FACES)
+            {
+                Vertex v1 = projected_points[0];
+                Vertex v2 = projected_points[1];
+                Vertex v3 = projected_points[2];
 
 
-            // Calculate Ranges
-            int minX = (int) Math.max(0, Math.ceil(Math.min(v1.x, Math.min(v2.x, v3.x))));
-            int maxX = (int) Math.min(img.getWidth() - 1, Math.floor(Math.max(v1.x, Math.max(v2.x, v3.x))));
-            int minY = (int) Math.max(0, Math.ceil(Math.min(v1.y, Math.min(v2.y, v3.y))));
-            int maxY = (int) Math.min(img.getHeight() - 1, Math.floor(Math.max(v1.y, Math.max(v2.y, v3.y))));
+                // Calculate Ranges
+                int minX = (int) Math.max(0, Math.ceil(Math.min(v1.x, Math.min(v2.x, v3.x))));
+                int maxX = (int) Math.min(img.getWidth() - 1, Math.floor(Math.max(v1.x, Math.max(v2.x, v3.x))));
+                int minY = (int) Math.max(0, Math.ceil(Math.min(v1.y, Math.min(v2.y, v3.y))));
+                int maxY = (int) Math.min(img.getHeight() - 1, Math.floor(Math.max(v1.y, Math.max(v2.y, v3.y))));
 
-            for (int y = minY; y <= maxY; y++) {
-                for (int x = minX; x <= maxX; x++) {
-                    Vertex p = new Vertex(x, y, 0);
+                for (int y = minY; y <= maxY; y++) {
+                    for (int x = minX; x <= maxX; x++) {
+                        Vertex p = new Vertex(x, y, 0);
 
-                    // Judge once for each vertex
-                    boolean V1 = sameSide(v1, v2, v3, p);
-                    boolean V2 = sameSide(v2, v3, v1, p);
-                    boolean V3 = sameSide(v3, v1, v2, p);
-                    if (V3 && V2 && V1) {
-                        img.setRGB(x, y, t.color.getRGB());
+                        // Judge once for each vertex
+                        boolean V1 = sameSide(v1, v2, v3, p);
+                        boolean V2 = sameSide(v2, v3, v1, p);
+                        boolean V3 = sameSide(v3, v1, v2, p);
+                        if (V3 && V2 && V1) {
+                            img.setRGB(x, y, t.color.getRGB());
+                        }
                     }
                 }
             }
+
+
         }
 
 

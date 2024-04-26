@@ -15,7 +15,8 @@ public class Renderer {
     static final boolean ROTATE_MODE = true;
     static final int TARGET_FPS = 60;
     // Overrides Target FPS
-    static final boolean FPS_TEST = true;
+    static final boolean FPS_TEST = false;
+    static final boolean DRAW_FACES = false;
 
     public static void main(String[] args)
     {
