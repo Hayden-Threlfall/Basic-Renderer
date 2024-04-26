@@ -14,4 +14,13 @@ public class Vertex {
     {
         System.out.println("X: " + this.x + " Y: " + this.y + " Z: " + this.z);
     }
+
+    public Vertex cross(Vertex other)
+    {
+        return new Vertex(
+                this.y * other.z - this.z * other.y,
+                this.z * other.x - this.x * other.z,
+                this.x * other.y - this.y * other.x
+        );
+    }
 }

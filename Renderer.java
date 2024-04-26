@@ -13,6 +13,9 @@ public class Renderer {
     static final boolean SHOW_AXIS_LINES = false;
     static final Color BACKGROUND_COLOR = Color.BLACK;
     static final boolean ROTATE_MODE = true;
+    static final int TARGET_FPS = 60;
+    // Overrides Target FPS
+    static final boolean FPS_TEST = true;
 
     public static void main(String[] args)
     {
@@ -21,12 +24,13 @@ public class Renderer {
         final double DRAG_SPEED = 50;
         final double ASPECT_RATIO = (double) HEIGHT / WIDTH;
         final double FOV_RAD = 1 / (Math.tan(Math.toRadians(FOV / 2.0)));
-        final double Z_NEAR = 0.1;
+        final double Z_NEAR = 0;
         final double Z_FAR = 1000;
         final double Q = Z_FAR/(Z_FAR - Z_NEAR);
 
         Point mouse = new Point(0, 0);
         ArrayList<Object3D> world_objects = new ArrayList<Object3D>();
+        Vertex Camera = new Vertex(0, 0, 0);
 
         // X, Y, Z Axis Lines
         if (SHOW_AXIS_LINES)
@@ -57,7 +61,15 @@ public class Renderer {
         }
 
         // OTHER OBJECTS
-        Cube c = new Cube(3, Color.WHITE, new Vertex(-1.5, -1.5, -1.5));
+        Cube c = new Cube(3, Color.WHITE, new Vertex(0, 0, 0), true);
+
+        c.setFaceColor('S', Color.RED);
+        c.setFaceColor('E', Color.CYAN);
+        c.setFaceColor('N', Color.GREEN);
+        c.setFaceColor('W', Color.ORANGE);
+        c.setFaceColor('B', Color.YELLOW);
+        c.setFaceColor('T', Color.BLUE);
+
 
         world_objects.add(c);
 
@@ -103,7 +115,7 @@ public class Renderer {
                 // Render Stored 3D Objects
                 for (Object3D object : world_objects)
                 {
-                    object.draw(g2, x_r_transform, z_r_transform, map_projection);
+                    object.draw(g2, x_r_transform, z_r_transform, map_projection, Camera);
                 }
             }
         };
@@ -137,14 +149,34 @@ public class Renderer {
 
         // Rotate mode needs 60~ fps
         if (ROTATE_MODE) {
+            long sleep_time = (long)Math.floor(1000/TARGET_FPS);
+            if (FPS_TEST)
+                sleep_time = 1;
+
+            int frames = 0;
+            long startTime = System.currentTimeMillis();
+            long endTime = 0;
             while (true) {
                 renderingPanel.repaint();
+                frames++;
 
-                mouse.x += 1;
-                mouse.y += 0.25;
+                endTime = System.currentTimeMillis();
+
+                double deltaTime = (double) (endTime - startTime);
+                if (deltaTime >= 1000)
+                {
+                    double FPS = frames / (deltaTime/1000);
+                    System.out.println("FPS: " + FPS);
+
+                    frames = 0;
+                    startTime = System.currentTimeMillis();
+                }
+
+                mouse.x = (System.currentTimeMillis() / 100.0) * 2;
+                mouse.y = (System.currentTimeMillis() / 100.00) * 1;
 
                 try {
-                    Thread.sleep(41);
+                    Thread.sleep(sleep_time);
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(1);
