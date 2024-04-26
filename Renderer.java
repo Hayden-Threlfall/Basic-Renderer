@@ -75,8 +75,6 @@ public class Renderer {
                 g2.setColor(BACKGROUND_COLOR);
                 g2.fillRect(0, 0, getWidth(), getHeight());
 
-                // Center at origin (middle of screen)
-//                g2.translate(getWidth() / 2, getHeight() / 2);
 
                 // Calculate POV transform
                 Matrix4 map_projection = new Matrix4(new double[][]{
