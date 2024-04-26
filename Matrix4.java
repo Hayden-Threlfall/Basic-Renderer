@@ -1,5 +1,3 @@
-import java.awt.*;
-
 public class Matrix4 {
 
     double[][] values;
@@ -9,7 +7,7 @@ public class Matrix4 {
         this.values = v;
     }
 
-    public Point3D multiplyPoint(Point3D in)
+    public Vertex multiplyPoint(Vertex in)
     {
         double[] result_matrix = new double[]{
                 in.x * this.values[0][0] + in.y * this.values[1][0] + in.z * this.values[2][0] + this.values[3][0],
@@ -25,7 +23,7 @@ public class Matrix4 {
             result_matrix[2] /= result_matrix[3];
         }
 
-        return new Point3D(
+        return new Vertex(
                 result_matrix[0],
                 result_matrix[1],
                 result_matrix[2]

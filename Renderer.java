@@ -9,8 +9,8 @@ public class Renderer {
 
     static final int HEIGHT = 1080;
     static final int WIDTH = 1920;
-    static final int FOV = 90;
-    static final boolean SHOW_AXIS_LINES = true;
+    static final int FOV = 120;
+    static final boolean SHOW_AXIS_LINES = false;
     static final Color BACKGROUND_COLOR = Color.BLACK;
     static final boolean ROTATE_MODE = true;
 
@@ -26,31 +26,31 @@ public class Renderer {
         final double Q = Z_FAR/(Z_FAR - Z_NEAR);
 
 //        Point2D mouse = new Point2D(WIDTH / 2, HEIGHT / 2);
-        Point2D mouse = new Point2D(0, 0);
+        Point mouse = new Point(0, 0);
         ArrayList<Object3D> world_objects = new ArrayList<Object3D>();
 
         // X, Y, Z Axis Lines
         if (SHOW_AXIS_LINES)
         {
-            Line3D z_line = new Line3D(new Point3D[]{
-                    new Point3D(0, 0, -3),
-                    new Point3D(0, 0, 3)
+            Line3D z_line = new Line3D(new Vertex[]{
+                    new Vertex(0, 0, -3),
+                    new Vertex(0, 0, 3)
             },
                     Color.BLUE);
 
             world_objects.add(z_line);
 
-            Line3D x_line = new Line3D(new Point3D[]{
-                    new Point3D(-3, 0, 0),
-                    new Point3D(3, 0, 0)
+            Line3D x_line = new Line3D(new Vertex[]{
+                    new Vertex(-3, 0, 0),
+                    new Vertex(3, 0, 0)
             },
                     Color.RED);
 
             world_objects.add(x_line);
 
-            Line3D y_line = new Line3D(new Point3D[]{
-                    new Point3D(0, -3, 0),
-                    new Point3D(0, 3, 0)
+            Line3D y_line = new Line3D(new Vertex[]{
+                    new Vertex(0, -3, 0),
+                    new Vertex(0, 3, 0)
             },
                     Color.GREEN);
 
@@ -58,7 +58,7 @@ public class Renderer {
         }
 
         // OTHER OBJECTS
-        Cube c = new Cube(1, Color.WHITE, new Point3D(-0.5, -0.5, -0.5));
+        Cube c = new Cube(3, Color.WHITE, new Vertex(-1.5, -1.5, -1.5));
 
         world_objects.add(c);
 
@@ -148,7 +148,7 @@ public class Renderer {
                 mouse.y += 0.25;
 
                 try {
-                    Thread.sleep(25);
+                    Thread.sleep(41);
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(1);

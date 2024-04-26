@@ -1,5 +1,3 @@
-import java.awt.*;
-
 public class Matrix3 {
 
     double[] values;
@@ -27,9 +25,9 @@ public class Matrix3 {
         return new Matrix3(result);
     }
 
-    Point3D transform(Point3D in)
+    Vertex transform(Vertex in)
     {
-        return new Point3D(
+        return new Vertex(
                 in.x * values[0] + in.y * values[3] + in.z * values[6],
                 in.x * values[1] + in.y * values[4] + in.z * values[7],
                 in.x * values[2] + in.y * values[5] + in.z * values[8]

@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.awt.geom.Path2D;
 
 public abstract class Object3D
 {
@@ -28,7 +27,7 @@ public abstract class Object3D
     {
         for (Triangle t : this.triangles)
         {
-            for (Point3D p : t.points)
+            for (Vertex p : t.points)
             {
                 p.print();
             }
