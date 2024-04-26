@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public abstract class Object3D
 {
@@ -17,10 +18,13 @@ public abstract class Object3D
     {
         g2.setColor(this.color);
 
+        BufferedImage img = new BufferedImage(Renderer.WIDTH, Renderer.HEIGHT, BufferedImage.TYPE_INT_ARGB);
         for (Triangle t : this.triangles)
         {
-            t.draw(g2, x_r_transform, z_r_transform, map_projection);
+            img = t.draw(g2, x_r_transform, z_r_transform, map_projection, img);
         }
+
+        g2.drawImage(img, 0, 0, null);
     }
 
     public void print()

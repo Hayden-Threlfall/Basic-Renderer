@@ -19,7 +19,7 @@ public class Triangle {
         this.color = c;
     }
 
-    public void draw(Graphics2D g2, Matrix4 x_r_transform, Matrix4 z_r_transform, Matrix4 map_projection)
+    public BufferedImage draw(Graphics2D g2, Matrix4 x_r_transform, Matrix4 z_r_transform, Matrix4 map_projection, BufferedImage img)
     {
         Path2D path = new Path2D.Double();
         g2.setColor(this.color);
@@ -68,7 +68,7 @@ public class Triangle {
         Vertex v2 = projected_points[1];
         Vertex v3 = projected_points[2];
 
-        BufferedImage img = new BufferedImage(Renderer.WIDTH, Renderer.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+
 
         // Calculate Ranges
         int minX = (int) Math.max(0, Math.ceil(Math.min(v1.x, Math.min(v2.x, v3.x))));
@@ -90,7 +90,7 @@ public class Triangle {
             }
         }
 
-        g2.drawImage(img, 0, 0, null);
+        return img;
     }
 
     static boolean sameSide(Vertex A, Vertex B, Vertex C, Vertex P)
