@@ -2,6 +2,8 @@ import java.awt.Color;
 
 public class Cube extends Object3D{
 
+    Cube() { super(); }
+
     Cube(double size, Color c, Vertex cube_origin, boolean center_on_origin)
     {
         super();

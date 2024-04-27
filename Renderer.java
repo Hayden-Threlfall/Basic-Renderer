@@ -15,8 +15,8 @@ public class Renderer {
     static final boolean ROTATE_MODE = true;
     static final int TARGET_FPS = 60;
     // Overrides Target FPS
-    static final boolean FPS_TEST = true;
-    static final boolean DRAW_FACES = true;
+    static final boolean FPS_TEST = false;
+    static final boolean DRAW_FACES = false;
 
     public static void main(String[] args)
     {
@@ -32,6 +32,7 @@ public class Renderer {
         Point mouse = new Point(0, 0);
         ArrayList<Object3D> world_objects = new ArrayList<Object3D>();
         Vertex Camera = new Vertex(0, 0, 0);
+        Vertex light_direction = new Vertex(0, 0, -1);
 
         // X, Y, Z Axis Lines
         if (SHOW_AXIS_LINES)
@@ -62,14 +63,20 @@ public class Renderer {
         }
 
         // OTHER OBJECTS
-        Cube c = new Cube(3, Color.WHITE, new Vertex(0, 0, 0), true);
+//        Cube c = new Cube(3, Color.WHITE, new Vertex(0, 0, 0), true);
+//        Cube c = new Cube();
+//        c.loadFromOBJ("objs/cube.obj");
+//
+//        c.setFaceColor('S', Color.RED);
+//        c.setFaceColor('E', Color.CYAN);
+//        c.setFaceColor('N', Color.GREEN);
+//        c.setFaceColor('W', Color.ORANGE);
+//        c.setFaceColor('B', Color.YELLOW);
+//        c.setFaceColor('T', Color.BLUE);
+        Object3D c = new Object3D();
 
-        c.setFaceColor('S', Color.RED);
-        c.setFaceColor('E', Color.CYAN);
-        c.setFaceColor('N', Color.GREEN);
-        c.setFaceColor('W', Color.ORANGE);
-        c.setFaceColor('B', Color.YELLOW);
-        c.setFaceColor('T', Color.BLUE);
+        c.loadFromOBJ("objs/tetrahedron.obj");
+        c.randomRGB();
 
 
         world_objects.add(c);
@@ -116,7 +123,7 @@ public class Renderer {
                 // Render Stored 3D Objects
                 for (Object3D object : world_objects)
                 {
-                    object.draw(g2, x_r_transform, z_r_transform, map_projection, Camera);
+                    object.draw(g2, x_r_transform, z_r_transform, map_projection, Camera, light_direction);
                 }
             }
         };
@@ -152,7 +159,7 @@ public class Renderer {
         if (ROTATE_MODE) {
             long sleep_time = (long)Math.floor(1000.0 / TARGET_FPS);
             if (FPS_TEST)
-                sleep_time = 1;
+                sleep_time = 0;
 
             int frames = 0;
             long startTime = System.currentTimeMillis();
@@ -173,8 +180,8 @@ public class Renderer {
                     startTime = System.currentTimeMillis();
                 }
 
-                mouse.x = (System.currentTimeMillis() / 100.0) * 2;
-                mouse.y = (System.currentTimeMillis() / 100.00) * 1;
+                mouse.x = (System.currentTimeMillis() / 100.0) * 4;
+                mouse.y = (System.currentTimeMillis() / 100.00) * 4;
 
                 try {
                     Thread.sleep(sleep_time);
