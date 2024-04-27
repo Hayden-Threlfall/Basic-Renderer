@@ -21,8 +21,9 @@ public abstract class Object3D
     {
         BufferedImage img = new BufferedImage(Renderer.WIDTH, Renderer.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 
-        double[] zBuffer = new double[img.getWidth() * img.getHeight()];
-        Arrays.fill(zBuffer, Double.NEGATIVE_INFINITY);
+        double[][] zBuffer = new double[img.getHeight()][img.getWidth()];
+        for (double[] row : zBuffer)
+            Arrays.fill(row, Double.MAX_VALUE);
 
         for (Triangle t : this.triangles)
         {
@@ -36,34 +37,19 @@ public abstract class Object3D
             for (int i = 0; i < t.points.length; i++)
             {
                 rotated_points[i] = z_r_transform.multiplyPoint(x_r_transform.multiplyPoint(t.points[i]));
+
+                // Screen Offset
                 rotated_points[i].z += 8;
             }
 
             // Calculate Normals and stuff
-            Vertex line1 = new Vertex(
-                    rotated_points[1].x - rotated_points[0].x,
-                    rotated_points[1].y - rotated_points[0].y,
-                    rotated_points[1].z - rotated_points[0].z
-                    );
-            Vertex line2 = new Vertex(
-                    rotated_points[2].x - rotated_points[0].x,
-                    rotated_points[2].y - rotated_points[0].y,
-                    rotated_points[2].z - rotated_points[0].z
-                    );
-
-            Vertex normal = line1.cross(line2);
+            Vertex normal = getNormal(rotated_points);
 
             // Normalise normal vector?
-            double n = Math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-            normal.x /= n;
-            normal.y /= n;
-            normal.z /= n;
-
-            // If normal.z < 0
-            if (!((normal.x * (rotated_points[0].x - Camera.x) +
-                    normal.y * (rotated_points[0].y - Camera.y) +
-                    normal.z * (rotated_points[0].z - Camera.z)) < 0))
-                continue;
+            double normal_length = Math.sqrt((normal.x * normal.x) + (normal.y * normal.y) + (normal.z * normal.z));
+            normal.x /= normal_length;
+            normal.y /= normal_length;
+            normal.z /= normal_length;
 
             // Project Points
             for (int i = 0; i < t.points.length; i++)
@@ -108,42 +94,51 @@ public abstract class Object3D
                 int minY = (int) Math.max(0, Math.ceil(Math.min(v1.y, Math.min(v2.y, v3.y))));
                 int maxY = (int) Math.min(img.getHeight() - 1, Math.floor(Math.max(v1.y, Math.max(v2.y, v3.y))));
 
-                for (int y = minY; y <= maxY; y++) {
-                    for (int x = minX; x <= maxX; x++) {
-                        Vertex p = new Vertex(x, y, 0);
+                double triangleArea = (v1.y - v3.y) * (v2.x - v3.x) + (v2.y - v3.y) * (v3.x - v1.x);
 
-                        // Judge once for each vertex
-                        boolean V1 = sameSide(v1, v2, v3, p);
-                        boolean V2 = sameSide(v2, v3, v1, p);
-                        boolean V3 = sameSide(v3, v1, v2, p);
-                        if (V3 && V2 && V1) {
-                            img.setRGB(x, y, t.color.getRGB());
+                for (int y = minY; y <= maxY; y++)
+                {
+                    for (int x = minX; x <= maxX; x++)
+                    {
+
+                        double b1 = ((y - v3.y) * (v2.x - v3.x) + (v2.y - v3.y) * (v3.x - x)) / triangleArea;
+                        double b2 = ((y - v1.y) * (v3.x - v1.x) + (v3.y - v1.y) * (v1.x - x)) / triangleArea;
+                        double b3 = ((y - v2.y) * (v1.x - v2.x) + (v1.y - v2.y) * (v2.x - x)) / triangleArea;
+
+                        if (b1 >= 0 && b1 <= 1 && b2 >= 0 && b2 <= 1 && b3 >= 0 && b3 <= 1)
+                        {
+
+                            double depth = b1 * v1.z + b2 * v2.z + b3 * v3.z;
+
+                            if (zBuffer[y][x] > depth)
+                            {
+                                img.setRGB(x, y, t.color.getRGB());
+                                zBuffer[y][x] = depth;
+                            }
                         }
                     }
                 }
             }
-
-
         }
 
-
-        g2.drawImage(img, 0, 0, null);
+        if (Renderer.DRAW_FACES)
+            g2.drawImage(img, 0, 0, null);
     }
 
-    static boolean sameSide(Vertex A, Vertex B, Vertex C, Vertex P)
-    {
-        Vertex AB = new Vertex(B.x - A.x, B.y - A.y, B.z - A.z);
-        Vertex AC = new Vertex(C.x - A.x, C.y - A.y, C.z - A.z);
-        Vertex AP = new Vertex(P.x - A.x, P.y - A.y, P.z - A.z);
+    private static Vertex getNormal(Vertex[] rotated_points) {
+        Vertex line1 = new Vertex(
+                rotated_points[1].x - rotated_points[0].x,
+                rotated_points[1].y - rotated_points[0].y,
+                rotated_points[1].z - rotated_points[0].z
+                );
+        Vertex line2 = new Vertex(
+                rotated_points[2].x - rotated_points[0].x,
+                rotated_points[2].y - rotated_points[0].y,
+                rotated_points[2].z - rotated_points[0].z
+                );
 
-        // Take cross products
-        double ABcrossAC = AB.x * AC.y - AC.x * AB.y;
-        double ABcrossAP = AB.x * AP.y - AP.x * AB.y;
-
-        return ABcrossAC * ABcrossAP >= 0;
-
+        return line1.cross(line2);
     }
-
 
     public void print()
     {

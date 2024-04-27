@@ -9,14 +9,14 @@ public class Renderer {
 
     static final int HEIGHT = 1080;
     static final int WIDTH = 1920;
-    static final int FOV = 120;
+    static final int FOV = 90;
     static final boolean SHOW_AXIS_LINES = false;
     static final Color BACKGROUND_COLOR = Color.BLACK;
     static final boolean ROTATE_MODE = true;
     static final int TARGET_FPS = 60;
     // Overrides Target FPS
-    static final boolean FPS_TEST = false;
-    static final boolean DRAW_FACES = false;
+    static final boolean FPS_TEST = true;
+    static final boolean DRAW_FACES = true;
 
     public static void main(String[] args)
     {
@@ -24,8 +24,8 @@ public class Renderer {
 
         final double DRAG_SPEED = 50;
         final double ASPECT_RATIO = (double) HEIGHT / WIDTH;
-        final double FOV_RAD = 1 / (Math.tan(Math.toRadians(FOV / 2.0)));
-        final double Z_NEAR = 0;
+        final double FOV_RAD = 1.0 / (Math.tan(Math.toRadians(FOV / 2.0)));
+        final double Z_NEAR = 0.1;
         final double Z_FAR = 1000;
         final double Q = Z_FAR/(Z_FAR - Z_NEAR);
 
@@ -150,7 +150,7 @@ public class Renderer {
 
         // Rotate mode needs 60~ fps
         if (ROTATE_MODE) {
-            long sleep_time = (long)Math.floor(1000/TARGET_FPS);
+            long sleep_time = (long)Math.floor(1000.0 / TARGET_FPS);
             if (FPS_TEST)
                 sleep_time = 1;
 

@@ -28,85 +28,61 @@ public class Cube extends Object3D{
         super.triangles = new Triangle[]{
                 // South Face
                 new Triangle(
-                        vertices[0],
-                        vertices[1],
-                        vertices[4],
+                        cube_origin, vertices[4], vertices[5],
                         c
                 ),
                 new Triangle(
-                        vertices[1],
-                        vertices[5],
-                        vertices[4],
+                        cube_origin, vertices[5], vertices[1],
                         c
                 ),
 
                 // East Face
                 new Triangle(
-                        vertices[1],
-                        vertices[3],
-                        vertices[5],
+                        vertices[1], vertices[5], vertices[7],
                         c
                 ),
                 new Triangle(
-                        vertices[3],
-                        vertices[7],
-                        vertices[5],
+                        vertices[1], vertices[7], vertices[3],
                         c
                 ),
 
                 // North Face
                 new Triangle(
-                        vertices[2],
-                        vertices[3],
-                        vertices[6],
+                        vertices[2], vertices[6], vertices[7],
                         c
                 ),
                 new Triangle(
-                        vertices[3],
-                        vertices[7],
-                        vertices[6],
+                        vertices[2], vertices[7], vertices[3],
                         c
                 ),
 
                 // West Face
                 new Triangle(
-                        vertices[0],
-                        vertices[2],
-                        vertices[4],
+                        cube_origin, vertices[4], vertices[6],
                         c
                 ),
                 new Triangle(
-                        vertices[2],
-                        vertices[6],
-                        vertices[4],
+                        cube_origin, vertices[6], vertices[2],
                         c
                 ),
 
                 // Bottom
                 new Triangle(
-                        vertices[0],
-                        vertices[1],
-                        vertices[2],
+                        cube_origin, vertices[2], vertices[3],
                         c
                 ),
                 new Triangle(
-                        vertices[1],
-                        vertices[3],
-                        vertices[2],
+                        cube_origin, vertices[3], vertices[1],
                         c
                 ),
 
                 // Top
                 new Triangle(
-                        vertices[4],
-                        vertices[5],
-                        vertices[6],
+                        vertices[4], vertices[6], vertices[7],
                         c
                 ),
                 new Triangle(
-                        vertices[5],
-                        vertices[7],
-                        vertices[6],
+                        vertices[4], vertices[7], vertices[5],
                         c
                 ),
             };
