@@ -167,15 +167,23 @@ public class Renderer {
             long endTime = 0;
 
             long trueStartTime = System.currentTimeMillis();
-            long captureInterval = 100;
+            int delay = 5;
+
+            long captureInterval = 1000/100*delay;
             long captureDelayFromStart = 500;
             long lastCapture = trueStartTime + captureDelayFromStart - captureInterval;
-            int frames_to_capture = 100;
+            int frames_to_capture = 500;
             int frames_captured = 0;
 
             boolean drawn_gif = false;
-            BufferedImage[] captured_frames = new BufferedImage[frames_to_capture];
-
+            //BufferedImage[] captured_frames = new BufferedImage[frames_to_capture];
+            Giffer giffer;
+            try {
+                giffer = new Giffer("render.gif", delay, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
             while (true) {
                 renderingPanel.repaint();
                 frames++;
@@ -192,10 +200,16 @@ public class Renderer {
 
                     int center_x = WIDTH/2;
                     int center_y = HEIGHT/2;
-                    int box_size = 400;
+                    int box_size = 300;
                     int left_x = center_x - box_size/2;
                     int left_y = center_y - box_size/2;
-                    captured_frames[frames_captured] = bi.getSubimage(left_x, left_y, box_size, box_size);
+                    BufferedImage cropped = bi.getSubimage(left_x, left_y, box_size, box_size);
+                    //captured_frames[frames_captured] = cropped;
+                    try {
+                        giffer.addImage(cropped);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                     frames_captured++;              
                 } else if (!drawn_gif && frames_captured == frames_to_capture) {
@@ -203,7 +217,8 @@ public class Renderer {
                     Runnable thread = () -> {
                         System.out.println("---------------------------------Started drawing gif!");
                         try {
-                            Giffer.generateFromBI(captured_frames, "render.gif", 1, true);
+                            //Giffer.generateFromBI(captured_frames, "render.gif", 2, true);
+                            giffer.close();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

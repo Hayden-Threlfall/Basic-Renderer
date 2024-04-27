@@ -29,8 +29,34 @@ import javax.imageio.stream.ImageOutputStream;
  * loop is the boolean for whether you want to make the image loopable.
  */
 
-public abstract class Giffer {
-	
+public class Giffer {
+
+
+	ImageWriter gifWriter;
+    ImageOutputStream ios;
+    IIOMetadata metadata;
+
+    public Giffer(String output, int delay, boolean loop) 
+        throws IOException
+	{
+        this.gifWriter = getWriter();
+		this.ios = getImageOutputStream(output);
+		this.metadata = getMetadata(gifWriter, delay, loop);
+
+        this.gifWriter.setOutput(ios);
+		this.gifWriter.prepareWriteSequence(null);
+    }
+
+    public void addImage(BufferedImage img) throws IOException {
+        IIOImage temp = new IIOImage(img, null, metadata);
+        this.gifWriter.writeToSequence(temp, null);
+    }
+
+    public void close() throws IOException {
+        this.gifWriter.endWriteSequence();
+        this.ios.close();
+    }
+
 	// Generate gif from an array of filenames
 	// Make the gif loopable if loop is true
 	// Set the delay for each frame according to the delay (ms)
