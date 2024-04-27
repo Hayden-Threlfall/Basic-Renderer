@@ -174,6 +174,7 @@ public class Object3D
         } catch (FileNotFoundException e) {
             System.out.println("ERROR: OBJ File \"" + file_path + "\" not found.");
             e.printStackTrace();
+            return;
         }
 
         // Read data
