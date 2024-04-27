@@ -1,9 +1,14 @@
 import java.awt.*;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class Object3D
+public class Object3D
 {
     Triangle[] triangles;
 
@@ -17,7 +22,7 @@ public abstract class Object3D
         this.triangles = null;
     }
 
-    public void draw(Graphics2D g2, Matrix4 x_r_transform, Matrix4 z_r_transform, Matrix4 map_projection, Vertex Camera)
+    public void draw(Graphics2D g2, Matrix4 x_r_transform, Matrix4 z_r_transform, Matrix4 map_projection, Vertex Camera, Vertex light_direction)
     {
         BufferedImage img = new BufferedImage(Renderer.WIDTH, Renderer.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 
@@ -50,6 +55,10 @@ public abstract class Object3D
             normal.x /= normal_length;
             normal.y /= normal_length;
             normal.z /= normal_length;
+
+            // Back Face Culling should go here (zbuffer won't be needed i think when it works)
+            if (normal.z > 0)
+                continue;
 
             // Project Points
             for (int i = 0; i < t.points.length; i++)
@@ -112,7 +121,12 @@ public abstract class Object3D
 
                             if (zBuffer[y][x] > depth)
                             {
-                                img.setRGB(x, y, t.color.getRGB());
+                                // Now that we know we're coloring this pixel we do light calculations
+                                light_direction.normalise();
+                                double shade = light_direction.dot(normal);
+//                                double shade = Math.abs(normal.z);
+
+                                img.setRGB(x, y, t.getShade(shade).getRGB());
                                 zBuffer[y][x] = depth;
                             }
                         }
@@ -138,6 +152,73 @@ public abstract class Object3D
                 );
 
         return line1.cross(line2);
+    }
+
+    public void loadFromOBJ(String file_path)
+    {
+        Scanner reader;
+        File OBJ;
+        ArrayList<Vertex> v = new ArrayList<>();
+        ArrayList<Vertex> vn = new ArrayList<>();
+        ArrayList<Triangle> t = new ArrayList<>();
+        String line;
+        String[] f_data_temp;
+        int[] f_data = new int[3]; // Face Data
+        int i;
+
+
+        // Try to open file
+        try {
+            OBJ = new File(file_path);
+            reader = new Scanner(OBJ);
+        } catch (FileNotFoundException e) {
+            System.out.println("ERROR: OBJ File \"" + file_path + "\" not found.");
+            e.printStackTrace();
+        }
+
+        // Read data
+        while (reader.hasNextLine())
+        {
+            line = reader.nextLine();
+
+            String[] data = line.split(" ");
+
+            switch (data[0])
+            {
+                case "v":
+                    v.add(new Vertex(data[1], data[2], data[3]));
+                    break;
+                case "vn":
+                    vn.add(new Vertex(data[1], data[2], data[3]));
+                    break;
+                case "f":
+                    // Sample face data : "f 5//1 3//1 1//1" where each thing is v//normal_v
+
+                    for (i = 1; i < 4; i++)
+                    {
+                        f_data_temp = data[i].split("//");
+                        f_data[i-1] = Integer.parseInt(f_data_temp[0]) - 1;
+                    }
+
+                    t.add(new Triangle(v.get(f_data[0]), v.get(f_data[1]), v.get(f_data[2]), Color.WHITE));
+                    break;
+            }
+
+        }
+
+        this.triangles = new Triangle[t.size()];
+        this.triangles = t.toArray(this.triangles);
+    }
+
+    public void randomRGB()
+    {
+        for (Triangle t : triangles)
+        {
+            int r = ThreadLocalRandom.current().nextInt(0, 256);
+            int g = ThreadLocalRandom.current().nextInt(0, 256);
+            int b = ThreadLocalRandom.current().nextInt(0, 256);
+            t.color = new Color(r, g, b);
+        }
     }
 
     public void print()
