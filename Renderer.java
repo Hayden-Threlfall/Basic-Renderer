@@ -45,7 +45,7 @@ public class Renderer {
         final double Z_FAR = 1000;
         final double Q = Z_FAR/(Z_FAR - Z_NEAR);
 
-        Point mouse = new Point(0, 0);
+        Camera camera = new Camera();
         ArrayList<Object3D> world_objects = new ArrayList<Object3D>();
         Vertex Camera = new Vertex(0, 0, 0);
         Vertex light_direction = new Vertex(0, 0, -1);
@@ -120,7 +120,7 @@ public class Renderer {
                 });
 
                 // Calculate rotation Transforms
-                double pitch = Math.toRadians(mouse.y);
+                double pitch = Math.toRadians(camera.userY);
                 Matrix4 z_r_transform = new Matrix4(new double[][]{
                         {Math.cos(pitch), Math.sin(pitch), 0, 0},
                         {-Math.sin(pitch), Math.cos(pitch), 0 , 0},
@@ -128,7 +128,7 @@ public class Renderer {
                         {0, 0, 0, 1}
                 });
 
-                double roll = Math.toRadians(mouse.x);
+                double roll = Math.toRadians(camera.userX);
                 Matrix4 x_r_transform = new Matrix4(new double[][]{
                         {1, 0, 0, 0},
                         {0, Math.cos(roll), Math.sin(roll), 0},
@@ -152,17 +152,15 @@ public class Renderer {
                     double yi = DRAG_SPEED / renderingPanel.getHeight();
                     double xi = DRAG_SPEED / renderingPanel.getWidth();
 
-                    mouse.x += (e.getX() * xi);
-                    mouse.y += (e.getY() * yi);
+                    camera.userX += (e.getX() * xi);
+                    camera.userY += (e.getY() * yi);
 
                     renderingPanel.repaint();
                 }
             }
 
             @Override
-            public void mouseMoved(MouseEvent e) {
-
-            }
+            public void mouseMoved(MouseEvent e) {}
         });
 
         renderingPanel.addMouseListener(new MouseListener() {
@@ -192,16 +190,16 @@ public class Renderer {
                 int keyCode = e.getKeyCode();
                 switch (keyCode) {
                     case KeyEvent.VK_W:
-                        
+                        camera.moveFoward();
                         break;
                     case KeyEvent.VK_A:
-                        
+                        camera.moveLeft();
                         break;
                     case KeyEvent.VK_S:
-                        
+                        camera.moveBack();
                         break;
                     case KeyEvent.VK_D:
-                        
+                        camera.moveRight();
                         break;
                 }
             }
@@ -251,8 +249,8 @@ public class Renderer {
                     startTime = System.currentTimeMillis();
                 }
 
-                mouse.x = (System.currentTimeMillis() / 100.0) * 4;
-                mouse.y = (System.currentTimeMillis() / 100.00) * 4;
+                camera.userX = (System.currentTimeMillis() / 100.0) * 4;
+                camera.userY = (System.currentTimeMillis() / 100.00) * 4;
 
                 try {
                     Thread.sleep(sleep_time);
@@ -279,8 +277,8 @@ public class Renderer {
             }
             
             while (true) {
-                mouse.x = (System.currentTimeMillis() / 100.0) * 4;
-                mouse.y = (System.currentTimeMillis() / 100.00) * 4;
+                camera.userX = (System.currentTimeMillis() / 100.0) * 4;
+                camera.userY = (System.currentTimeMillis() / 100.00) * 4;
                 
                 long frameRenderStart = System.currentTimeMillis();
 
