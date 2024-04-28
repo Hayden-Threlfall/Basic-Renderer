@@ -13,7 +13,7 @@ public class Renderer {
     static final int FOV = 90;
     static final boolean SHOW_AXIS_LINES = false;
     static final Color BACKGROUND_COLOR = Color.BLACK;
-    static final boolean ROTATE_MODE = true;
+    static final boolean ROTATE_MODE = false;
     static final int TARGET_FPS = 60;
     // Overrides Target FPS
     static final boolean FPS_TEST = false;
@@ -22,9 +22,6 @@ public class Renderer {
 
     static final boolean RENDER_GIF = true;
     static final String RENDER_FILE = "render.gif";
-    //Time in ms to wait before starting to capture frames
-    //  Avoids some minor glitching between startup frame
-    static final long START_DELAY = 500;
     // Time between frames in GIF, 100 units to 1 second
     // e.x. DELAY = 5; means a frame every 1000/100*5 = 50 ms
     static final int DELAY = 5;
@@ -181,23 +178,6 @@ public class Renderer {
             long startTime = System.currentTimeMillis();
             long endTime = 0;
 
-            long trueStartTime = System.currentTimeMillis();
-
-            long captureInterval = 1000/100*DELAY;
-            long lastCapture = trueStartTime + START_DELAY - captureInterval;
-            int frames_captured = 0;
-
-            boolean drawn_gif = false;
-            //BufferedImage[] captured_frames = new BufferedImage[frames_to_capture];
-            Giffer giffer;
-            if (RENDER_GIF) {
-                try {
-                    giffer = new Giffer(RENDER_FILE, DELAY, true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return;
-                }
-            }
             
             while (true) {
                 renderingPanel.repaint();
@@ -205,50 +185,12 @@ public class Renderer {
 
                 endTime = System.currentTimeMillis();
 
-                if (RENDER_GIF && frames_captured < FRAMES_TO_CAPTURE && endTime - lastCapture >= captureInterval) {
-                    lastCapture = endTime;
-
-                    BufferedImage bi = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-                    Graphics2D g = bi.createGraphics();
-                    renderingPanel.print(g);
-                    g.dispose();
-
-                    int center_x = WIDTH/2;
-                    int center_y = HEIGHT/2;
-                    int left_x = center_x - GIF_SIZE/2;
-                    int left_y = center_y - GIF_SIZE/2;
-                    BufferedImage cropped = bi.getSubimage(left_x, left_y, GIF_SIZE, GIF_SIZE);
-                    //captured_frames[frames_captured] = cropped;
-                    try {
-                        giffer.addImage(cropped);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    frames_captured++;              
-                } else if (RENDER_GIF && !drawn_gif && frames_captured == FRAMES_TO_CAPTURE) {
-                    drawn_gif = true;
-                    Runnable thread = () -> {
-                        System.out.println("---------------------------------Started drawing gif!");
-                        try {
-                            //Giffer.generateFromBI(captured_frames, "render.gif", 2, true);
-                            giffer.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        System.out.println("---------------------------------Finished drawing gif!");
-                    };
-                    Thread run = new Thread(thread);
-                    run.start();
-                }
 
                 double deltaTime = (double) (endTime - startTime);
                 if (deltaTime >= 1000)
                 {
                     double FPS = frames / (deltaTime/1000);
                     System.out.println("FPS: " + FPS);
-                    if (!drawn_gif && RENDER_GIF)
-                        System.out.println("Captured frames: " + Integer.toString(frames_captured));
 
                     frames = 0;
                     startTime = System.currentTimeMillis();
@@ -259,6 +201,80 @@ public class Renderer {
 
                 try {
                     Thread.sleep(sleep_time);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            }
+        } else if (RENDER_GIF) {
+            long sleep_time = 1000/100*DELAY;
+
+            long startTime = System.currentTimeMillis();
+            long endTime = 0;
+
+            int frames_captured = 0;
+
+            //BufferedImage[] captured_frames = new BufferedImage[frames_to_capture];
+            Giffer giffer;
+            try {
+                giffer = new Giffer(RENDER_FILE, DELAY, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+            
+            while (true) {
+                mouse.x = (System.currentTimeMillis() / 100.0) * 4;
+                mouse.y = (System.currentTimeMillis() / 100.00) * 4;
+                
+                long frameRenderStart = System.currentTimeMillis();
+
+                renderingPanel.repaint();
+
+                endTime = System.currentTimeMillis();
+
+                BufferedImage bi = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = bi.createGraphics();
+                renderingPanel.print(g);
+                g.dispose();
+
+                int center_x = WIDTH/2;
+                int center_y = HEIGHT/2;
+                int left_x = center_x - GIF_SIZE/2;
+                int left_y = center_y - GIF_SIZE/2;
+                BufferedImage cropped = bi.getSubimage(left_x, left_y, GIF_SIZE, GIF_SIZE);
+                //captured_frames[frames_captured] = cropped;
+                try {
+                    giffer.addImage(cropped);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                frames_captured++;              
+
+                if (frames_captured == FRAMES_TO_CAPTURE) {
+                    System.out.println("---------------------------------Started drawing gif!");
+                    try {
+                        //Giffer.generateFromBI(captured_frames, "render.gif", 2, true);
+                        giffer.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("---------------------------------Finished drawing gif!");
+                    System.exit(1);
+                }
+
+                double deltaTime = (double) (endTime - startTime);
+                if (deltaTime >= 1000)
+                {
+                    System.out.println("Captured frames: " + Integer.toString(frames_captured));
+
+                    startTime = System.currentTimeMillis();
+                }
+
+                try {
+                    long currentTime = System.currentTimeMillis();
+                    Thread.sleep(Math.max(0, sleep_time - (currentTime - frameRenderStart)));
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(1);
