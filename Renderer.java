@@ -1,7 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -149,8 +152,8 @@ public class Renderer {
                     double yi = DRAG_SPEED / renderingPanel.getHeight();
                     double xi = DRAG_SPEED / renderingPanel.getWidth();
 
-                    mouse.x = e.getX() * xi;
-                    mouse.y = e.getY() * yi;
+                    mouse.x += (e.getX() * xi);
+                    mouse.y += (e.getY() * yi);
 
                     renderingPanel.repaint();
                 }
@@ -161,6 +164,58 @@ public class Renderer {
 
             }
         });
+
+        renderingPanel.addMouseListener(new MouseListener() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {}
+
+            @Override
+            public void mouseClicked(MouseEvent e) {}
+
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+        });
+
+        renderingPanel.addKeyListener(new KeyListener() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int keyCode = e.getKeyCode();
+                switch (keyCode) {
+                    case KeyEvent.VK_W:
+                        
+                        break;
+                    case KeyEvent.VK_A:
+                        
+                        break;
+                    case KeyEvent.VK_S:
+                        
+                        break;
+                    case KeyEvent.VK_D:
+                        
+                        break;
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {}
+        });
+
+
 
         pane.add(renderingPanel, BorderLayout.CENTER);
 
