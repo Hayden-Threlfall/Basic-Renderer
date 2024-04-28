@@ -215,10 +215,9 @@ public class Renderer {
 
                     int center_x = WIDTH/2;
                     int center_y = HEIGHT/2;
-                    int box_size = 300;
-                    int left_x = center_x - box_size/2;
-                    int left_y = center_y - box_size/2;
-                    BufferedImage cropped = bi.getSubimage(left_x, left_y, box_size, box_size);
+                    int left_x = center_x - GIF_SIZE/2;
+                    int left_y = center_y - GIF_SIZE/2;
+                    BufferedImage cropped = bi.getSubimage(left_x, left_y, GIF_SIZE, GIF_SIZE);
                     //captured_frames[frames_captured] = cropped;
                     try {
                         giffer.addImage(cropped);
